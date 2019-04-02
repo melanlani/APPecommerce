@@ -9,7 +9,9 @@ export default class ProductDetail extends React.Component {
   constructor (){
     super();
     this.state = {
-      imageHolder: 'https://s3.bukalapak.com/img/8660752382/s-160-160/BajuAtasanTunikKattyBlouseBajuMuslimBlusMuslimNavy_1_scaledj.jpg'
+      imageHolder: 'https://s3.bukalapak.com/img/8660752382/s-160-160/BajuAtasanTunikKattyBlouseBajuMuslimBlusMuslimNavy_1_scaledj.jpg',
+      nameProduct: 'Baju Gamis',
+      priceHolder: '62000'
     }
   }
 
@@ -47,11 +49,11 @@ export default class ProductDetail extends React.Component {
             <Icon name='star-half' style={styles.starColor} />
           </CardItem>
           <CardItem>
-            <Text style={styles.textProduct}>Baju Gamis</Text>
+            <Text style={styles.textProduct}>{this.state.nameProduct}</Text>
           </CardItem>
           <CardItem>
           <Left>
-            <Text style={styles.textPrice}>Rp 62.000</Text>
+            <Text style={styles.textPrice}>Rp {this.state.priceHolder}</Text>
           </Left>
           <Right>
             <Text>Stock >100psc</Text>
