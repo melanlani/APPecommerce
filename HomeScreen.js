@@ -30,7 +30,7 @@ export default class HomeScreen extends Component {
       <Container>
         <Header style={styles.header}>
         <Left>
-          <Button transparent onPress={this._onPressButton}>
+          <Button transparent>
             <Icon name='menu' />
           </Button>
         </Left>
@@ -41,24 +41,28 @@ export default class HomeScreen extends Component {
             <Button transparent>
               <Icon name="search" />
             </Button>
-            <Button transparent>
+            <Button transparent onPress={() => this.props.navigation.navigate("Cart")}>
               <Icon name="cart" />
             </Button>
           </Right>
         </Header>
 
           <Image source={{uri: 'https://s4.bukalapak.com/uploads/flash_banner/45483/mobile/s-960-390/Banner_Mobilerzkpesta.jpg'}} style={{height: 170 ,width: '100%', resizeMode: 'contain'}}/>
-
+          <Card>
+            <CardItem>
+            <Text style={{fontWeight: 'bold'}}>List Product</Text>
+            </CardItem>
+          </Card>
           <FlatList
             data={[
               {imageHolder: this.state.imageHolder,
                 nameProduct: this.state.nameProduct, priceHolder: this.state.priceHolder, navProduct: 'Detail' },
               {imageHolder: this.state.image2Holder,
-                nameProduct: this.state.name2Product, priceHolder: this.state.price2Holder, navProduct: 'Detail2' },
+                nameProduct: this.state.name2Product, priceHolder: this.state.price2Holder, navProduct: 'Detail' },
               {imageHolder: this.state.image3Holder,
-                nameProduct: this.state.name3Product, priceHolder: this.state.price3Holder, navProduct: 'Detail3' },
+                nameProduct: this.state.name3Product, priceHolder: this.state.price3Holder, navProduct: 'Detail' },
               {imageHolder: this.state.image4Holder,
-                nameProduct: this.state.name4Product, priceHolder: this.state.price4Holder, navProduct: 'Detail4' },
+                nameProduct: this.state.name4Product, priceHolder: this.state.price4Holder, navProduct: 'Detail' },
             ]}
             renderItem={({item}) =>
             <View style={{paddingLeft:30, paddingRight: 30}}>
@@ -76,7 +80,9 @@ export default class HomeScreen extends Component {
                 <Text>Rp {item.priceHolder}</Text>
                 </Left>
                 <Right>
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate(item.navProduct)}>
+                  <TouchableOpacity onPress={() => this.props.navigation.navigate(item.navProduct, {
+                    imageHolder: item.imageHolder, nameProduct: item.nameProduct, priceHolder: item.priceHolder
+                  })}>
                   <Text style={{color: '#E91E63'}}>Detail</Text>
                   </TouchableOpacity>
                 </Right>
