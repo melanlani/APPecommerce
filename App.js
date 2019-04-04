@@ -1,16 +1,20 @@
-import {createStackNavigator, createAppContainer} from 'react-navigation';
-import HomeScreen from './HomeScreen'
-import ProductDetail from './ProductDetail'
-import ListCart from './ListCart'
-import Cart from './Cart'
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import ShoppingCart from './ShoppingCart';
 
-const MainNavigator = createStackNavigator({
-  Home: {screen: HomeScreen},
-  Detail: {screen: ProductDetail},
-  ListCart: {screen: ListCart},
-  Cart: {screen: Cart},
+export default class App extends React.Component {
+  render() {
+    return (
+      <ShoppingCart />
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  }
 });
-
-const App = createAppContainer(MainNavigator);
-
-export default App;

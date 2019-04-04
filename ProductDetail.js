@@ -3,27 +3,20 @@ import {StyleSheet, Image, Text, View, TouchableOpacity} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
 
 export default class ProductDetail extends React.Component {
-  static navigationOptions = {
-    title: 'Detail Product',
-  };
-  constructor(props) {
-    super(props);
-      const { imageHolder, nameProduct, priceHolder } = props.navigation.state.params;
+  constructor() {
+    super();
 
       this.state = {
         count : 1,
-
-        product: {
-          imageHolder,
-          nameProduct,
-          priceHolder
-        }
       }
   }
-  
 
   render() {
-    const { imageHolder, nameProduct, priceHolder } = this.state.product;
+    const { navigation } = this.props;
+    const imageHolder = navigation.getParam("imageHolder", "No Image");
+    const nameProduct = navigation.getParam("nameProduct", "No Product");
+    const priceHolder = navigation.getParam("priceHolder", "No Price");
+
     return (
       <Container>
         <Header style={styles.header}>
@@ -39,8 +32,11 @@ export default class ProductDetail extends React.Component {
             <Button transparent>
               <Icon name="search" />
             </Button>
-            <Button transparent>
-              <Icon name="cart" />
+            <View style={{position:'absolute', height:25, width: 20, borderRadius:25, backgroundColor:'#E91E63', right:30, bottom: 15, alignItems:'center', justifyContent:'center', zIndex:2000}}>
+              <Text style={{color:'white', fontWeight: 'bold'}}>0</Text>
+            </View>
+            <Button transparent onPress={() => this.props.navigation.navigate("ListCart")}>
+            <Icon name="ios-cart"/>
             </Button>
           </Right>
         </Header>
@@ -70,7 +66,7 @@ export default class ProductDetail extends React.Component {
           </Button>
           <Text>{this.state.count}</Text>
           <Button info onPress={() => this.setState({ count: this.state.count -1})} style={{width:20, height:30}}>
-            <Text>  -</Text>
+            <Text>   -</Text>
           </Button>
           </Right>
           </CardItem>
@@ -81,9 +77,14 @@ export default class ProductDetail extends React.Component {
             <Button vertical>
               <Icon name="chatboxes" />
             </Button>
-            <Button active style={styles.header} onPress={() => this.props.navigation.navigate('ListCart', {
-              imageHolder: imageHolder, nameProduct: nameProduct, priceHolder: priceHolder, quantity: this.state.count
-            })}>
+            <Button active style={styles.header}
+            onPress={() => this.props.navigation.navigate('ListCart', {
+              imageHolder: imageHolder,
+              nameProduct: nameProduct,
+              priceHolder: priceHolder,
+              quantity: this.state.count
+            })
+          }>
               <Text>Beli</Text>
             </Button>
             <Button vertical>

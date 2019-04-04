@@ -1,28 +1,9 @@
 import React, { Component } from 'react';
 import {StyleSheet, Alert, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
+import {product} from './components/Data'
 
 export default class HomeScreen extends Component {
-  static navigationOptions = {
-    title: 'Welcome Shopping',
-  };
-  constructor (){
-    super();
-    this.state = {
-      imageHolder: 'https://s3.bukalapak.com/img/8660752382/s-160-160/BajuAtasanTunikKattyBlouseBajuMuslimBlusMuslimNavy_1_scaledj.jpg',
-      nameProduct: 'Baju Gamis',
-      priceHolder: '62000',
-      image2Holder: 'https://s4.bukalapak.com/img/4842381758/s-160-160/609114_081a450a_45d9_46b6_964a_d3b48fda20e4.png',
-      name2Product: 'Atasan Wanita Maroon',
-      price2Holder: '79000',
-      image3Holder: 'https://s4.bukalapak.com/img/4125871758/s-160-160/Flies___Denim_Shirt_2648___Biru.jpg',
-      name3Product: 'Denim Shirt',
-      price3Holder: '329000',
-      image4Holder: 'https://s1.bukalapak.com/img/6434710082/s-160-160/BajuAtasanWanitaHannyTunikBlouseBajuMuslimBlusMuslim_1_scale.jpg',
-      name4Product: 'Baju Atasan Gloria',
-      price4Holder: '81000'
-    }
-  }
 
   render() {
 
@@ -41,8 +22,11 @@ export default class HomeScreen extends Component {
             <Button transparent>
               <Icon name="search" />
             </Button>
-            <Button transparent onPress={() => this.props.navigation.navigate("Cart")}>
-              <Icon name="cart" />
+            <View style={{position:'absolute', height:25, width: 20, borderRadius:25, backgroundColor:'#E91E63', right:30, bottom: 15, alignItems:'center', justifyContent:'center', zIndex:2000}}>
+              <Text style={{color:'white', fontWeight: 'bold'}}>0</Text>
+            </View>
+            <Button transparent onPress={() => this.props.navigation.navigate("ListCart")}>
+            <Icon name="ios-cart"/>
             </Button>
           </Right>
         </Header>
@@ -53,17 +37,9 @@ export default class HomeScreen extends Component {
             <Text style={{fontWeight: 'bold'}}>List Product</Text>
             </CardItem>
           </Card>
+
           <FlatList
-            data={[
-              {imageHolder: this.state.imageHolder,
-                nameProduct: this.state.nameProduct, priceHolder: this.state.priceHolder, navProduct: 'Detail' },
-              {imageHolder: this.state.image2Holder,
-                nameProduct: this.state.name2Product, priceHolder: this.state.price2Holder, navProduct: 'Detail' },
-              {imageHolder: this.state.image3Holder,
-                nameProduct: this.state.name3Product, priceHolder: this.state.price3Holder, navProduct: 'Detail' },
-              {imageHolder: this.state.image4Holder,
-                nameProduct: this.state.name4Product, priceHolder: this.state.price4Holder, navProduct: 'Detail' },
-            ]}
+            data={product}
             renderItem={({item}) =>
             <View style={{paddingLeft:30, paddingRight: 30}}>
             <Card>
@@ -89,7 +65,6 @@ export default class HomeScreen extends Component {
               </CardItem>
             </Card>
             </View>
-
           }
           keyExtractor={(item, index) => index.toString()}
           />
