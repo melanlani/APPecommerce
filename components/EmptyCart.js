@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
-import {StyleSheet, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
-import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab, List, ListItem, Thumbnail } from 'native-base';
+import {StyleSheet, Text, View} from 'react-native';
+import {
+  Container,
+  Header,
+  Left,
+  Body,
+  Right,
+  Button,
+  Icon ,
+  Title
+} from 'native-base';
 
 class EmptyCart extends Component {
     render() {
         return (
 
-            <Container>
+            <Container >
               <Header style={styles.header}>
               <Left>
                 <Button transparent onPress={() => this.props.navigation.navigate("DrawerOpen")}>
@@ -22,9 +31,16 @@ class EmptyCart extends Component {
                   </Button>
                 </Right>
               </Header>
-              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+              <View style={{ justifyContent: "center", alignItems: "center", flex:1 }}>
+              <Icon
+                    style={{ color: "#E91E63", fontSize: 200 }}
+                    name="cart"
+                    position="bottomRight"
+                />
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: 'black' }}>
                   Cart Still Empty
               </Text>
+              </View>
 
           </Container>
         );

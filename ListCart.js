@@ -1,43 +1,71 @@
 import React, { Component } from 'react';
 import {StyleSheet, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
-import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab, List, ListItem, Thumbnail } from 'native-base';
+import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card } from 'native-base';
+import { withNavigation } from "react-navigation";
+
 import EmptyCart from "./components/EmptyCart";
-export default class ListCart extends React.Component {
-  constructor() {
-        super();
+import Cart from "./components/Cart";
+
+class ListCart extends Component {
+  constructor(props) {
+        super(props);
+
         this.state = {
-            cartList: []
+            totalPrice: 0,
+            itemDetail: [],
         };
     }
+    componentDidMount(){
+        // this.addData();
 
-  render() {
-    const { navigation } = this.props;
-        this.focusListener = navigation.addListener("willFocus", () => {
-            const { navigation } = this.props;
-            const imageHolder = navigation.getParam("imageHolder", "");
-            const nameProduct = navigation.getParam("nameProduct", "");
-            const priceHolder = navigation.getParam("priceHolder", "");
+        this.props.navigation.addListener("willFocus", route => {
+            this.addData();
+        })
+    }
+    addData() {
+        const { navigation } = this.props;
+        const imageHolder = navigation.getParam("imageHolder", "");
+        const nameProduct = navigation.getParam("nameProduct", "");
+        const priceHolder = navigation.getParam("priceHolder", "");
+        const key = navigation.getParam("key", "");
+        const quantity = navigation.getParam("quantity","");
+        // alert(key);
+        if (key !== "") {
+            // alert(key);
+            const findKey = this.state.itemDetail.findIndex((val,i)=>{
+                return val.key === key;
+            });
 
-            const getProductQuantity = navigation.getParam(
-                "quantity",
-                ""
-            );
-
-            if (nameProduct !== "") {
+            if(findKey === -1){
                 this.setState({
-                    cartList: [
-                        ...this.state.cartList,
+                    itemDetail: [
+                        ...this.state.itemDetail,
                         {
+                            key: key,
                             imageHolder: imageHolder,
                             nameProduct: nameProduct,
                             priceHolder: priceHolder,
-                            quantity: getProductQuantity
+                            quantity: quantity
                         }
                     ]
                 });
             }
-        });
-        if (this.state.cartList.length) {
+
+        }
+    }
+  render() {
+    let totalPrice = 0;
+    this.state.itemDetail.forEach((item) => {
+      totalPrice += item.quantity * item.priceHolder;
+    })
+    const {navigate} = this.props.navigation;
+
+
+        if (this.state.itemDetail.length < 1) {
+            return (
+                <EmptyCart />
+            );
+        } else {
 
         return(
           <Container>
@@ -57,44 +85,51 @@ export default class ListCart extends React.Component {
               </Right>
             </Header>
 
-
             <FlatList
-              data={this.state.cartList}
-              renderItem={({item}) =>
-              <List key={this.props.keyval}>
-              <ListItem thumbnail>
-                <Left>
-                  <Thumbnail square source={{ uri: item.imageHolder }} />
-                </Left>
-                <Body>
-                  <Text>{item.nameProduct}</Text>
-                  <Text note numberOfLines={1}>Rp {item.priceHolder}</Text>
-                  <Text style={{fontWeight: 'bold'}}>Qty: {item.quantity}</Text>
-                </Body>
-                <Right>
-                  <Button transparent>
-                    <Icon name='trash' />
-                  </Button>
-                </Right>
-              </ListItem>
-            </List>
-            }
+              data={this.state.itemDetail}
+              renderItem={({item}) =>(
+
+                <Cart
+                    nameProduct={item.nameProduct}
+                    priceHolder={item.priceHolder}
+                    imageHolder={item.imageHolder}
+                    navProduct={item.navProduct}
+                    quantity={item.quantity}
+                    key={item.key}
+
+                    getDelete={(key) => {
+                        this.state.itemDetail.splice(key, 1);
+                        this.setState({ itemDetail: this.state.itemDetail})
+                    }}
+                />
+              )}
+
             keyExtractor={(item, index) => index.toString()}
             />
 
-          <Footer>
-            <FooterTab style={styles.footer}>
-              <Button active style={styles.footer}>
-                <Text>Bayar</Text>
-              </Button>
-            </FooterTab>
-          </Footer>
+            <Card>
+              <CardItem>
+              <Left>
+                  <Text style={styles.textTotal}>Total</Text>
+              </Left>
+              <Right>
+                <Text style={styles.textPrice}>Rp. {totalPrice}</Text>
+              </Right>
+              </CardItem>
+            <CardItem>
+            <Left></Left>
+            <Body>
+            <Button style={{width:100, backgroundColor:'#E91E63'}}>
+              <Text style={{left:22, color:'white'}}>Checkout</Text>
+            </Button>
+            </Body>
+            <Right></Right>
+            </CardItem>
+            </Card>
         </Container>
       );
-  } else {
-      return <EmptyCart />;
+      }
   }
-}
 }
 
 const styles = StyleSheet.create({
@@ -109,6 +144,10 @@ const styles = StyleSheet.create({
     color: '#E91E63',
     fontSize: 18
   },
+  textTotal: {
+    fontWeight: 'bold',
+    fontSize: 18
+  },
   starColor: {
     color: 'orange'
   },
@@ -116,3 +155,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   }
   });
+  export default withNavigation(ListCart);

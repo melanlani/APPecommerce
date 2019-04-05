@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import {StyleSheet, Alert, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
 import {product} from './components/Data'
+import Product from "./components/Product";
 
-export default class HomeScreen extends Component {
+class HomeScreen extends Component {
 
   render() {
 
@@ -22,12 +23,6 @@ export default class HomeScreen extends Component {
             <Button transparent>
               <Icon name="search" />
             </Button>
-            <View style={{position:'absolute', height:25, width: 20, borderRadius:25, backgroundColor:'#E91E63', right:30, bottom: 15, alignItems:'center', justifyContent:'center', zIndex:2000}}>
-              <Text style={{color:'white', fontWeight: 'bold'}}>0</Text>
-            </View>
-            <Button transparent onPress={() => this.props.navigation.navigate("ListCart")}>
-            <Icon name="ios-cart"/>
-            </Button>
           </Right>
         </Header>
 
@@ -40,34 +35,28 @@ export default class HomeScreen extends Component {
 
           <FlatList
             data={product}
-            renderItem={({item}) =>
-            <View style={{paddingLeft:30, paddingRight: 30}}>
-            <Card>
-              <CardItem>
-                <Left>
-                  <Text>{item.nameProduct}</Text>
-                </Left>
-              </CardItem>
-              <CardItem cardBody>
-                <Image source={{uri: item.imageHolder}} style={{height: 200, width: null, flex: 1}}/>
-              </CardItem>
-              <CardItem>
-                <Left>
-                <Text>Rp {item.priceHolder}</Text>
-                </Left>
-                <Right>
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate(item.navProduct, {
-                    imageHolder: item.imageHolder, nameProduct: item.nameProduct, priceHolder: item.priceHolder
-                  })}>
-                  <Text style={{color: '#E91E63'}}>Detail</Text>
-                  </TouchableOpacity>
-                </Right>
-              </CardItem>
-            </Card>
-            </View>
-          }
+            renderItem={({item}) =>(
+                            <Product
+                                // _onPress={this._onPress}
+                                nameProduct={item.nameProduct}
+                                priceHolder={item.priceHolder}
+                                imageHolder={item.imageHolder}
+                                navProduct={item.navProduct}
+                                key={item.key}
+                                getDetails={() => {
+                                    this.props.navigation.navigate(item.navProduct, {
+                                        key: item.id,
+                                        nameProduct: item.nameProduct,
+                                        priceHolder: item.priceHolder,
+                                        imageHolder: item.imageHolder,
+                                    });
+                                }}
+                            />
+                        )}
+
           keyExtractor={(item, index) => index.toString()}
           />
+
       </Container>
     );
   }
@@ -81,3 +70,4 @@ const styles = StyleSheet.create({
   backgroundColor: '#E91E63',
   },
   });
+export default HomeScreen;
