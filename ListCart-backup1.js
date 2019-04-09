@@ -132,7 +132,7 @@ class ListCart extends Component {
               </Right>
               </CardItem>
             <CardItem>
-            <Button style={{width:320, backgroundColor:'#E91E63'}} onPress={() => {this.props.navigation.navigate('Checkout', { totalPrice: totalPrice });}}>
+            <Button style={{width:320, backgroundColor:'#E91E63'}} onPress={() => {this.props.navigation.navigate('Checkout');}}>
               <Text style={{left:130, color:'white'}}>Checkout</Text>
             </Button>
             </CardItem>

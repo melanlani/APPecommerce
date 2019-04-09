@@ -5,7 +5,7 @@ import { Icon } from 'native-base';
 import HomeScreen from '../HomeScreen'
 import ListCart from '../ListCart'
 
-export const RouteNav = createBottomTabNavigator({
+export const ButtomNav = createBottomTabNavigator({
   //   Home: { screen: HomeScreen },
   //   Settings: { screen: SettingsScreen },
   //   Profile: { screen: ProfileScreen },
@@ -30,4 +30,4 @@ export const RouteNav = createBottomTabNavigator({
 
 
 //export const SignedOut = createAppContainer(SignedOutNavigator);
-export default createAppContainer(RouteNav);
+export default createAppContainer(ButtomNav);

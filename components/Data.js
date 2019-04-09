@@ -26,5 +26,19 @@ export const product = [
     priceHolder: 81000,
     imageHolder: require("../assets/4.jpg"),
     navProduct: 'Detail'
+  },
+  {
+    id: 5,
+    nameProduct: 'Denim Shirt 2',
+    priceHolder: 19000,
+    imageHolder: require("../assets/3.jpg"),
+    navProduct: 'Detail'
+  },
+  {
+    id: 6,
+    nameProduct: 'Baju Atasan Gloria 2',
+    priceHolder: 20000,
+    imageHolder: require("../assets/4.jpg"),
+    navProduct: 'Detail'
   }
 ]

@@ -4,11 +4,28 @@ import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Ca
 
 class Product extends Component {
 
+  formatPrice = (num)=> {
+    num = num.toString().replace(/\Rp|/g,'');
+    if(isNaN(num))
+      num = "0";
+    sign = (num == (num = Math.abs(num)));
+    num = Math.floor(num*100+0.50000000001);
+    cents = num%100;
+    num = Math.floor(num/100).toString();
+    if(cents<10)
+      cents = "0" + cents;
+    for (var i = 0; i < Math.floor((num.length-(1+i))/3); i++)
+      num = num.substring(0,num.length-(4*i+3))+'.'+
+      num.substring(num.length-(4*i+3));
+      return `${num},${cents}`
+  }
   render() {
 
     return (
 
-            <View style={{paddingLeft:30, paddingRight: 30}}>
+        <Grid>
+          <Col style={{ height: 250 }}>
+            <TouchableOpacity onPress={this.props.getDetails}>
             <Card>
               <CardItem>
                 <Left>
@@ -16,20 +33,15 @@ class Product extends Component {
                 </Left>
               </CardItem>
               <CardItem cardBody>
-                <Image source={this.props.imageHolder} style={{height: 200, width: null, flex: 1}}/>
+                <Image source={this.props.imageHolder} style={{height: 150, width: 175}}/>
               </CardItem>
               <CardItem>
-                <Left>
-                <Text>Rp {this.props.priceHolder}</Text>
-                </Left>
-                <Right>
-                  <TouchableOpacity onPress={this.props.getDetails}>
-                  <Text style={{color: '#E91E63'}}>Detail</Text>
-                  </TouchableOpacity>
-                </Right>
+                <Text style={styles.textPrice}>Rp {this.formatPrice(this.props.priceHolder)}</Text>
               </CardItem>
             </Card>
-            </View>
+            </TouchableOpacity>
+          </Col>
+        </Grid>
     );
   }
 }
@@ -41,5 +53,9 @@ const styles = StyleSheet.create({
   header: {
   backgroundColor: '#E91E63',
   },
+  textPrice: {
+    color: '#E91E63',
+    fontSize: 12
+  }
   });
 export default Product;

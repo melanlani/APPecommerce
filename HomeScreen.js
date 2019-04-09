@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {StyleSheet, Alert, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
-import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
+import { Container, Content, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
 import {product} from './components/Data'
 import Product from "./components/Product";
 
@@ -25,7 +25,7 @@ class HomeScreen extends Component {
             </Button>
           </Right>
         </Header>
-
+        <Content>
           <Image source={{uri: 'https://s4.bukalapak.com/uploads/flash_banner/45483/mobile/s-960-390/Banner_Mobilerzkpesta.jpg'}} style={{height: 170 ,width: '100%', resizeMode: 'contain'}}/>
           <Card>
             <CardItem>
@@ -35,6 +35,7 @@ class HomeScreen extends Component {
 
           <FlatList
             data={product}
+            numColumns={2}
             renderItem={({item}) =>(
                             <Product
                                 // _onPress={this._onPress}
@@ -56,6 +57,7 @@ class HomeScreen extends Component {
 
           keyExtractor={(item, index) => index.toString()}
           />
+        </Content>
 
       </Container>
     );

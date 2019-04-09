@@ -62,7 +62,6 @@ class Cart extends Component {
     const {id, imageHolder, nameProduct, priceHolder, quantity, getDelete} = this.props;
     let total = 0;
     total += this.state.count * priceHolder;
-
     return (
 
             <List key={id}>
@@ -84,7 +83,7 @@ class Cart extends Component {
                   </View>
               </Body>
               <Right>
-                <Button transparent onPress={getDelete.bind(id)}>
+                <Button transparent onPress={getDelete.bind(this,id)}>
                   <Icon name='trash' style={{color:'#E91E63'}}/>
                 </Button >
               </Right>

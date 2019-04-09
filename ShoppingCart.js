@@ -6,11 +6,13 @@ import { Icon } from 'native-base';
 import HomeScreen from './HomeScreen'
 import ProductDetail from './ProductDetail'
 import ListCart from './ListCart'
-import RouteNav from './components/RouteNav'
+import Checkout from './Checkout'
+import Finished from './Finished'
+import ButtomNav from './components/buttomNav'
 
-const MainNavigator = createStackNavigator({
-
-  HomeScreen: { screen: RouteNav,
+const MainNavigator = createStackNavigator(
+  {
+  HomeScreen: { screen: ButtomNav,
     headerMode: 'none',
     navigationOptions: {
       header: null,
@@ -23,7 +25,33 @@ const MainNavigator = createStackNavigator({
   Detail : {screen: ProductDetail,
       headerMode: '',
       navigationOptions: {
-      title: 'Detail',
+      title: 'Detail Page',
+      headerStyle: {
+        backgroundColor: '#E91E63',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
+    }
+  },
+  Checkout : {screen: Checkout,
+      headerMode: '',
+      navigationOptions: {
+      title: 'Checkout Page',
+      headerStyle: {
+        backgroundColor: '#E91E63',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
+    }
+  },
+  Finished : {screen: Finished,
+      headerMode: '',
+      navigationOptions: {
+      title: 'Finishing',
       headerStyle: {
         backgroundColor: '#E91E63',
       },
@@ -42,7 +70,11 @@ const MainNavigator = createStackNavigator({
 
     }
   }
-  })
+},
+  {
+   initialRouteName: 'HomeScreen'
+  }
+)
 
 
 
