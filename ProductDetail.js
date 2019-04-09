@@ -26,19 +26,6 @@ class ProductDetail extends Component {
       return `${num},${cents}`
   }
 
-  handlePlus= () => {
-    this.setState({
-      count: this.state.count + 1
-    })
-  }
-
-  handleMinus= () => {
-    if(this.state.count > 1) {
-      this.setState({
-        count:this.state.count - 1
-      })
-    }
-  }
 
   render() {
     const { navigation } = this.props;
@@ -88,32 +75,17 @@ class ProductDetail extends Component {
           </CardItem>
           <Card>
             <CardItem>
-            <Left>
-              <Text style={styles.textProduct}>Quantity </Text>
-              <View style={{flex: 1, flexDirection: 'row'}}>
-              <Button info onPress={this.handleMinus} style={{width:20, height:30, backgroundColor:'#E91E63'}}>
-                <Text>   -</Text>
-              </Button>
-              <Text style={styles.textProduct}>  {this.state.count}  </Text>
-              <Button info onPress={this.handlePlus} style={{width:20, height:30, backgroundColor:'#E91E63'}}>
-                <Text>  +</Text>
-              </Button>
-              </View>
-            </Left>
-            <Right>
-            <Button active style={{backgroundColor:'#E91E63', width:80}}
+            <Button active style={{width:320, backgroundColor:'#E91E63'}}
                 onPress={() => {this.props.navigation.navigate('ListCart', {
                   key: key,
                   imageHolder: imageHolder,
                   nameProduct: nameProduct,
                   priceHolder: priceHolder,
-                  quantity: this.state.count,
                   totalPrice: priceHolder * this.state.count
                 });
               }}>
-              <Text style={{color:'white', left:9}}>Add to Cart</Text>
+              <Text style={{left:130, color:'white'}}>Add to Cart</Text>
             </Button>
-            </Right>
             </CardItem>
           </Card>
         </Card>
