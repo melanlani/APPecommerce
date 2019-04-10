@@ -33,7 +33,7 @@ class Product extends Component {
                 </Left>
               </CardItem>
               <CardItem cardBody>
-                <Image source={this.props.imageHolder} style={{height: 150, width: 175}}/>
+                <Image source={{ uri: this.props.imageHolder }} style={{height: 150, width: 175}}/>
               </CardItem>
               <CardItem>
                 <Text style={styles.textPrice}>Rp {this.formatPrice(this.props.priceHolder)}</Text>

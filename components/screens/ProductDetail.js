@@ -41,7 +41,7 @@ class ProductDetail extends Component {
           <CardItem>
           </CardItem>
           <CardItem>
-            <Image source={imageHolder} style={{height: 320, width: null, flex: 1}}/>
+            <Image source={{uri: imageHolder}} style={{height: 320, width: null, flex: 1}}/>
           </CardItem>
           <CardItem>
           <Left>

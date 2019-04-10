@@ -1,10 +1,29 @@
 import React, { Component } from 'react';
 import {StyleSheet, Alert, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
 import { Container, Content, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
-import {product} from './Data'
+import Axios from 'axios';
 import Product from "./Product";
 
 class HomeScreen extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      products: []
+    }
+  }
+
+  componentDidMount(){
+    Axios.get('http://192.168.43.192:3333/api/v1/products')
+    .then((response) => {
+      this.setState({
+        products: response.data.data
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  }
 
   render() {
 
@@ -34,7 +53,7 @@ class HomeScreen extends Component {
           </Card>
 
           <FlatList
-            data={product}
+            data={this.state.products}
             numColumns={2}
             renderItem={({item}) =>(
                             <Product

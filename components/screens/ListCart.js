@@ -149,7 +149,7 @@ class ListCart extends Component {
                 <Card>
                   <CardItem>
                     <Left>
-                      <Thumbnail square source={item.imageHolder} />
+                      <Thumbnail square source={{uri: item.imageHolder}} />
                       <Body>
                         <Text style={styles.textProduct}>{ item.nameProduct }</Text>
                         <Text note>{this.formatPrice(item.priceHolder)}/pcs</Text>
