@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {StyleSheet, Alert, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
 import { Container, Content, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
-import {product} from './components/Data'
-import Product from "./components/Product";
+import {product} from './Data'
+import Product from "./Product";
 
 class HomeScreen extends Component {
 

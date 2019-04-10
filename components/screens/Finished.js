@@ -31,16 +31,18 @@ class Finished extends Component {
     const courier = navigation.getParam("courier");
     const address = navigation.getParam("address");
     return (
-      <Container>
 
+      <Container>
       <View style={styles.container}>
         <Text style={styles.welcome}>Thankyou For Your Order!</Text>
-        <View>
-          <Text style={styles.welcome}>User's number handphone: {number}</Text>
-          <Text style={styles.welcome}>User's address: {address}</Text>
-          <Text style={styles.welcome}>Your payment order: Rp. {this.formatPrice(totalPrice)}</Text>
-          <Text style={styles.welcome}>Use Courier: {courier}</Text>
+      </View>
+        <View style={{ flex: 1, marginTop:100}}>
+          <Text style={styles.instructions}>User's number handphone: {number}</Text>
+          <Text style={styles.instructions}>User's address: {address}</Text>
+          <Text style={styles.instructions}>Your payment order: Rp. {this.formatPrice(totalPrice)}</Text>
+          <Text style={styles.instructions}>Your Courier: {courier}</Text>
         </View>
+      <View style={styles.container}>
         <Text style={styles.instructions}>Please send money to store account number</Text>
         <Text style={styles.instructions}>Bank Mandiri 111xxxxxxxx</Text>
       </View>

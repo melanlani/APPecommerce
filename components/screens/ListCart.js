@@ -15,7 +15,7 @@ import {
   Input
 } from 'native-base';
 
-import EmptyCart from "./components/EmptyCart";
+import EmptyCart from "./EmptyCart";
 
 class ListCart extends Component {
   constructor(props) {
@@ -49,7 +49,7 @@ class ListCart extends Component {
           });
 
           const total1 = this.state.itemCart.map(item => item.sub_total_priceHolder)
-          const total2 = this._totalPrice(total1)
+          const total2 = this.totalFormula(total1)
           this.setState({
             itemCart: itemCart,
             total_price: total2
@@ -62,7 +62,7 @@ class ListCart extends Component {
   componentDidMount() {
   }
 
-  _totalPrice = arr => arr.reduce((accumulator, currentValue) => parseInt(accumulator, 10) + parseInt(currentValue, 10))
+  totalFormula = arr => arr.reduce((accumulator, currentValue) => parseInt(accumulator, 10) + parseInt(currentValue, 10))
 
   formatPrice = (num)=> {
     num = num.toString().replace(/\Rp|/g,'');
@@ -79,31 +79,36 @@ class ListCart extends Component {
       num.substring(num.length-(4*i+3));
       return `${num},${cents}`
   }
-  getDelete=(index) => {
+  getDelete = (index) => {
       this.state.itemCart.splice(index, 1);
-      this.setState({ itemCart: this.state.itemCart})
+
+      this.forceUpdate()
+
+      const total1 = this.state.itemCart.map(item => item.sub_total_priceHolder)
+      const total2 = this.totalFormula(total1)
+      this.setState({ itemCart: this.state.itemCart, total_price: total2})
   }
 
-  _incQuantity = (index) => {
+  handlePlus = (index) => {
     this.state.itemCart[index].quantity = this.state.itemCart[index].quantity+1
     this.state.itemCart[index].sub_total_priceHolder = parseInt(this.state.itemCart[index].quantity, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
     this.forceUpdate()
 
     const total1 = this.state.itemCart.map(item => item.sub_total_priceHolder)
-    const total2 = this._totalPrice(total1)
+    const total2 = this.totalFormula(total1)
     this.setState({
       total_price: total2
     })
   }
 
-  _decQuantity = (index) => {
+  handleMin = (index) => {
     if(this.state.itemCart[index].quantity > 1) {
     this.state.itemCart[index].quantity = this.state.itemCart[index].quantity-1
     this.state.itemCart[index].sub_total_priceHolder = parseInt(this.state.itemCart[index].quantity, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
     this.forceUpdate()
 
     const total1 = this.state.itemCart.map(item => item.sub_total_priceHolder)
-    const total2 = this._totalPrice(total1)
+    const total2 = this.totalFormula(total1)
     this.setState({
       total_price: total2
     })
@@ -151,7 +156,7 @@ class ListCart extends Component {
                       </Body>
                     </Left>
                     <Right>
-                      <Button transparent small onPress={this.getDelete.bind(item.id)} style={{ width: 40, justifyContent: 'center', alignItems: 'center' }}>
+                      <Button transparent small onPress={this.getDelete.bind(this,index)} style={{ width: 40, justifyContent: 'center', alignItems: 'center' }}>
                         <Icon name="close" style={{color:'#E91E63'}}/>
                       </Button>
                     </Right>
@@ -159,13 +164,13 @@ class ListCart extends Component {
                   <CardItem>
                   <Left>
                   <View style={{ flex: 1, flexDirection: 'row' }}>
-                    <Button success small onPress={ () => this._decQuantity(index) } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
+                    <Button success small onPress={ () => this.handleMin(index) } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
                       <Text>-</Text>
                     </Button>
                     <View style={{ marginLeft: 8, marginTop: -11 }}>
                       <Input placeholder={`${item.quantity}`} style={{ justifyContent: 'center', alignItems: 'center' }} disabled />
                     </View>
-                    <Button success small onPress={ () => this._incQuantity(index) } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
+                    <Button success small onPress={ () => this.handlePlus(index) } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
                       <Text>+</Text>
                     </Button>
                   </View>

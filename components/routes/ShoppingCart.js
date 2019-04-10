@@ -3,12 +3,12 @@ import {Platform, StyleSheet, Text, View} from 'react-native';
 import {createStackNavigator, createAppContainer} from 'react-navigation';
 import { Icon } from 'native-base';
 
-import HomeScreen from './HomeScreen'
-import ProductDetail from './ProductDetail'
-import ListCart from './ListCart'
-import Checkout from './Checkout'
-import Finished from './Finished'
-import ButtomNav from './components/buttomNav'
+import HomeScreen from '../screens/HomeScreen'
+import ProductDetail from '../screens/ProductDetail'
+import ListCart from '../screens/ListCart'
+import Checkout from '../screens/Checkout'
+import Finished from '../screens/Finished'
+import ButtomNav from './buttomNav'
 
 const MainNavigator = createStackNavigator(
   {
