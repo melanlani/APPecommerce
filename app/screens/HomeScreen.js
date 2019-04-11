@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {StyleSheet, Alert, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
 import { Container, Content, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
-import Axios from 'axios';
+import axios from 'axios';
 import Product from "./Product";
 
 class HomeScreen extends Component {
@@ -13,7 +13,7 @@ class HomeScreen extends Component {
   }
 
   componentDidMount(){
-    Axios.get('http://192.168.43.192:3333/api/v1/products')
+    axios.get('http://192.168.43.192:3333/api/v1/products')
     .then((response) => {
       this.setState({
         products: response.data.data
@@ -45,7 +45,7 @@ class HomeScreen extends Component {
           </Right>
         </Header>
         <Content>
-          <Image source={{uri: 'https://s4.bukalapak.com/uploads/flash_banner/45483/mobile/s-960-390/Banner_Mobilerzkpesta.jpg'}} style={{height: 170 ,width: '100%', resizeMode: 'contain'}}/>
+          <Image source={require('../assets/banner.jpg')} style={{height: 170 ,width: '100%', resizeMode: 'contain'}}/>
           <Card>
             <CardItem>
             <Text style={{fontWeight: 'bold'}}>List Product</Text>
@@ -58,17 +58,14 @@ class HomeScreen extends Component {
             renderItem={({item}) =>(
                             <Product
                                 // _onPress={this._onPress}
-                                nameProduct={item.nameProduct}
-                                priceHolder={item.priceHolder}
-                                imageHolder={item.imageHolder}
-                                navProduct={item.navProduct}
-                                key={item.key}
+                                productName={item.nameProduct}
+                                productPrice={item.priceHolder}
+                                productImage={item.imageHolder}
+                                description={item.description}
+                                productID={item.id}
                                 getDetails={() => {
-                                    this.props.navigation.navigate(item.navProduct, {
-                                        key: item.id,
-                                        nameProduct: item.nameProduct,
-                                        priceHolder: item.priceHolder,
-                                        imageHolder: item.imageHolder,
+                                    this.props.navigation.navigate('Detail', {
+                                        id: item.id
                                     });
                                 }}
                             />

@@ -1,15 +1,44 @@
 import React, { Component } from 'react';
 import {StyleSheet, Image, Text, View, TouchableOpacity} from 'react-native';
-import { Container, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
+import { Container, Content, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
+import axios from 'axios';
 
 class ProductDetail extends Component {
   constructor(props) {
     super(props);
 
       this.state = {
-        count : 1,
+        productId: '',
+        productImage: '',
+        productName: '',
+        productPrice: '',
+        description: ''
       }
   }
+
+  componentDidMount() {
+    //memanggil id produk dari list produk
+    const { navigation } = this.props;
+    const id = navigation.getParam("id", "");
+    const baseUrl = "http://192.168.43.192:3333";
+
+    axios.get(`${baseUrl}/api/v1/products/${id}`)
+    //mengambil data state dari database
+    .then((response) => {
+      const res = response.data.data;
+      this.setState({
+        productId: res.id,
+        productImage: res.imageHolder,
+        productName: res.nameProduct,
+        productPrice: res.priceHolder,
+        description: res.description,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+
   formatPrice = (num)=> {
     num = num.toString().replace(/\Rp|/g,'');
     if(isNaN(num))
@@ -28,27 +57,22 @@ class ProductDetail extends Component {
 
 
   render() {
-    const { navigation } = this.props;
-    const imageHolder = navigation.getParam("imageHolder", "No Image");
-    const nameProduct = navigation.getParam("nameProduct", "No Product");
-    const priceHolder = navigation.getParam("priceHolder", "No Price");
-    const key = navigation.getParam("key", "");
-    // alert(key);
     return (
       <Container>
+        <Content>
 
         <Card>
           <CardItem>
           </CardItem>
           <CardItem>
-            <Image source={{uri: imageHolder}} style={{height: 320, width: null, flex: 1}}/>
+            <Image source={{uri: `${this.state.productImage}`}} style={{height: 320, flex: 1}}/>
           </CardItem>
           <CardItem>
           <Left>
-            <Text style={styles.textProduct}>{nameProduct}</Text>
+            <Text style={styles.textProduct}>{this.state.productName}</Text>
           </Left>
           <Right>
-            <Text style={styles.textPrice}>Rp {this.formatPrice(priceHolder)} /pcs</Text>
+            <Text style={styles.textPrice}>Rp {this.formatPrice(this.state.productPrice)} /pcs</Text>
           </Right>
           </CardItem>
         </Card>
@@ -73,22 +97,38 @@ class ProductDetail extends Component {
             <Text>0</Text>
             </Right>
           </CardItem>
+        </Card>
+
+        <Card>
+          <CardItem header>
+            <Text style={styles.textProduct}>Description</Text>
+          </CardItem>
+          <CardItem>
+              <Body>
+                <Text>
+                  {this.state.description}
+                </Text>
+              </Body>
+            </CardItem>
           <Card>
             <CardItem>
             <Button active style={{width:320, backgroundColor:'#E91E63'}}
                 onPress={() => {this.props.navigation.navigate('ListCart', {
-                  key: key,
-                  imageHolder: imageHolder,
-                  nameProduct: nameProduct,
-                  priceHolder: priceHolder,
-                  totalPrice: priceHolder * this.state.count
+                      productId: this.state.productId
+              //     imageHolder: imageHolder,
+              //     nameProduct: nameProduct,
+              //     priceHolder: priceHolder,
+              //     totalPrice: priceHolder * this.state.count
                 });
-              }}>
+              }}
+              >
               <Text style={{left:130, color:'white'}}>Add to Cart</Text>
             </Button>
             </CardItem>
           </Card>
         </Card>
+
+        </Content>
       </Container>
     );
   }

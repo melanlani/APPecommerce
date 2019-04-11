@@ -29,14 +29,14 @@ class Product extends Component {
             <Card>
               <CardItem>
                 <Left>
-                  <Text>{this.props.nameProduct}</Text>
+                  <Text>{this.props.productName}</Text>
                 </Left>
               </CardItem>
               <CardItem cardBody>
-                <Image source={{ uri: this.props.imageHolder }} style={{height: 150, width: 175}}/>
+                <Image source={{ uri: this.props.productImage }} style={{height: 150, width: 175}}/>
               </CardItem>
               <CardItem>
-                <Text style={styles.textPrice}>Rp {this.formatPrice(this.props.priceHolder)}</Text>
+                <Text style={styles.textPrice}>Rp {this.formatPrice(this.props.productPrice)}</Text>
               </CardItem>
             </Card>
             </TouchableOpacity>
