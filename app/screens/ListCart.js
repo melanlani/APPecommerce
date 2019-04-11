@@ -14,42 +14,53 @@ import {
   Thumbnail,
   Input
 } from 'native-base';
-import axios from 'axios';
+
 import EmptyCart from "./EmptyCart";
 
 class ListCart extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      productId: '',
-      productImage: '',
-      productName: '',
-      productPrice: '',
-      quantity: 1
+      itemCart: [],
     }
   }
 
-  componentDidMount() {
-    //memanggil id produk dari list produk
-    const { navigation } = this.props;
-    const productId = navigation.getParam("productId", "");
-    const baseUrl = "http://192.168.43.192:3333";
+  // componentWillMount() {
+  //   this.props.navigation.addListener("willFocus", route => {
+  //     const { navigation } = this.props;
+  //     const imageHolder = navigation.getParam("imageHolder", "");
+  //     const nameProduct = navigation.getParam("nameProduct", "");
+  //     const priceHolder = navigation.getParam("priceHolder", "");
+  //     const key = navigation.getParam("key", "");
+  //
+  //     if (key !== undefined) {
+  //       const findKey = this.state.itemCart.findIndex((val, i) => {
+  //         return val.key === key;
+  //       });
+  //       if (findKey === -1) {
+  //         let itemCart = this.state.itemCart;
+  //         itemCart.push({
+  //           key: key,
+  //           imageHolder: imageHolder,
+  //           nameProduct: nameProduct,
+  //           priceHolder: priceHolder,
+  //           quantity: 1,
+  //           sub_total_priceHolder: priceHolder
+  //         });
+  //
+  //         const total1 = this.state.itemCart.map(item => item.sub_total_priceHolder)
+  //         const total2 = this.totalFormula(total1)
+  //         this.setState({
+  //           itemCart: itemCart,
+  //           total_price: total2
+  //         })
+  //       }
+  //     }
+  //   })
+  // }
 
-    axios.get(`${baseUrl}/api/v1/products/${productId}`)
-    //mengambil data state dari database
-    .then((response) => {
-      const res = response.data.data;
-      this.setState({
-        productId: res.productId,
-        productImage: res.imageHolder,
-        productName: res.nameProduct,
-        productPrice: res.priceHolder
-      });
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }
+
+  totalFormula = arr => arr.reduce((accumulator, currentValue) => parseInt(accumulator, 10) + parseInt(currentValue, 10))
 
   formatPrice = (num)=> {
     num = num.toString().replace(/\Rp|/g,'');
@@ -66,34 +77,56 @@ class ListCart extends Component {
       num.substring(num.length-(4*i+3));
       return `${num},${cents}`
   }
-  // getDelete = (index) => {
-  //     this.state.itemCart.splice(index, 1);
-  //     this.setState({ itemCart: this.state.itemCart, total_price: total2})
-  // }
+  getDelete = (index) => {
+      this.state.itemCart.splice(index, 1);
 
-  handlePlus= () => {
+      this.forceUpdate()
+
+      const total1 = this.state.itemCart.map(item => item.sub_total_priceHolder)
+      const total2 = this.totalFormula(total1)
+      this.setState({ itemCart: this.state.itemCart, total_price: total2})
+  }
+
+  handlePlus = (index) => {
+    this.state.itemCart[index].quantity = this.state.itemCart[index].quantity+1
+    this.state.itemCart[index].sub_total_priceHolder = parseInt(this.state.itemCart[index].quantity, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
+    this.forceUpdate()
+
+    const total1 = this.state.itemCart.map(item => item.sub_total_priceHolder)
+    const total2 = this.totalFormula(total1)
     this.setState({
-      quantity: this.state.quantity + 1
+      total_price: total2
     })
   }
 
-  handleMinus= () => {
-    if(this.state.quantity > 0) {
-      this.setState({
-        quantity:this.state.quantity - 1
-      })
-    }
+  handleMin = (index) => {
+    if(this.state.itemCart[index].quantity > 1) {
+    this.state.itemCart[index].quantity = this.state.itemCart[index].quantity-1
+    this.state.itemCart[index].sub_total_priceHolder = parseInt(this.state.itemCart[index].quantity, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
+    this.forceUpdate()
+
+    const total1 = this.state.itemCart.map(item => item.sub_total_priceHolder)
+    const total2 = this.totalFormula(total1)
+    this.setState({
+      total_price: total2
+    })
   }
+}
 
   render() {
-    let subTotal = 0;
-    subTotal += this.state.quantity * this.state.productPrice;
+    const {navigate} = this.props.navigation;
+
+        if (this.state.itemCart.length < 1) {
+            return (
+                <EmptyCart />
+            )
+        }
 
         return(
           <Container>
             <Header style={styles.header}>
             <Left>
-              <Button transparent onPress={() => this.props.navigation.navigate("DrawerOpen")}>
+              <Button transparent>
                 <Icon name='menu' />
               </Button>
             </Left>
@@ -107,40 +140,47 @@ class ListCart extends Component {
               </Right>
             </Header>
 
-            <Card>
-              <CardItem>
-                <Left>
-                  <Thumbnail square source={{uri: this.state.productImage}} />
-                  <Body>
-                    <Text style={styles.textProduct}>{this.state.productName }</Text>
-                    <Text note>{this.formatPrice(this.state.productPrice)}/pcs</Text>
+            <FlatList
+              style={{ flex: 1 }}
+              data={this.state.itemCart}
+              renderItem={({ item, index }) => (
+                <Card>
+                  <CardItem>
+                    <Left>
+                      <Thumbnail square source={{uri: item.imageHolder}} />
+                      <Body>
+                        <Text style={styles.textProduct}>{ item.nameProduct }</Text>
+                        <Text note>{this.formatPrice(item.priceHolder)}/pcs</Text>
+                      </Body>
+                    </Left>
+                    <Right>
+                      <Button transparent small onPress={this.getDelete.bind(this,index)} style={{ width: 40, justifyContent: 'center', alignItems: 'center' }}>
+                        <Icon name="close" style={{color:'#E91E63'}}/>
+                      </Button>
+                    </Right>
+                  </CardItem>
+                  <CardItem>
+                  <Left>
+                  <View style={{ flex: 1, flexDirection: 'row' }}>
+                    <Button success small onPress={ () => this.handleMin(index) } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
+                      <Text>-</Text>
+                    </Button>
+                    <View style={{ marginLeft: 8, marginTop: -11 }}>
+                      <Input placeholder={`${item.quantity}`} style={{ justifyContent: 'center', alignItems: 'center' }} disabled />
+                    </View>
+                    <Button success small onPress={ () => this.handlePlus(index) } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
+                      <Text>+</Text>
+                    </Button>
+                  </View>
+                  </Left>
+                  <Body style={{ marginRight: -90 }}>
+                    <Text style={{fontWeight:'bold'}}>Sub Total: {this.formatPrice(item.sub_total_priceHolder)}</Text>
                   </Body>
-                </Left>
-                <Right>
-                  <Button transparent small style={{ width: 40, justifyContent: 'center', alignItems: 'center' }}>
-                    <Icon name="close" style={{color:'#E91E63'}}/>
-                  </Button>
-                </Right>
-              </CardItem>
-              <CardItem>
-              <Left>
-              <View style={{ flex: 1, flexDirection: 'row' }}>
-                <Button success small onPress={this.handleMinus } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
-                  <Text>-</Text>
-                </Button>
-                <View style={{ marginLeft: 8, marginTop: -11 }}>
-                  <Input placeholder={`${this.state.quantity}`} style={{ justifyContent: 'center', alignItems: 'center' }} disabled />
-                </View>
-                <Button success small onPress={this.handlePlus } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
-                  <Text>+</Text>
-                </Button>
-              </View>
-              </Left>
-              <Body style={{ marginRight: -90 }}>
-                <Text style={{fontWeight:'bold'}}>Sub Total: {this.formatPrice(subTotal)}</Text>
-              </Body>
-              </CardItem>
-            </Card>
+                </CardItem>
+              </Card>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            />
 
             <Card>
               <CardItem>
@@ -148,11 +188,13 @@ class ListCart extends Component {
                   <Text style={styles.textTotal}>Total</Text>
               </Left>
               <Right>
-                <Text style={styles.textPrice}>Rp. </Text>
+                <Text style={styles.textPrice}>Rp. {this.formatPrice(this.state.total_price)} </Text>
               </Right>
               </CardItem>
             <CardItem>
-            <Button style={{width:320, backgroundColor:'#E91E63'}} onPress={() => {this.props.navigation.navigate('Checkout');}}>
+            <Button style={{width:320, backgroundColor:'#E91E63'}} onPress={() => {this.props.navigation.navigate('Checkout', {
+                        totalPrice: this.state.total_price
+                      });}}>
               <Text style={{left:130, color:'white'}}>Checkout</Text>
             </Button>
             </CardItem>

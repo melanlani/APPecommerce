@@ -12,7 +12,8 @@ class ProductDetail extends Component {
         productImage: '',
         productName: '',
         productPrice: '',
-        description: ''
+        description: '',
+        quantity: 1
       }
   }
 
@@ -113,14 +114,24 @@ class ProductDetail extends Component {
           <Card>
             <CardItem>
             <Button active style={{width:320, backgroundColor:'#E91E63'}}
-                onPress={() => {this.props.navigation.navigate('ListCart', {
-                      productId: this.state.productId
-              //     imageHolder: imageHolder,
-              //     nameProduct: nameProduct,
-              //     priceHolder: priceHolder,
-              //     totalPrice: priceHolder * this.state.count
-                });
-              }}
+            onPress={() => {
+                        const baseUrl = "http://192.168.43.192:3333";
+                        axios.post(`${baseUrl}/api/v1/order`, {
+                                product_id: this.state.productId,
+                                qty: this.state.quantity,
+                                price: this.state.productPrice
+                            })
+                            .then(function (response) {
+                              alert('Product added successfully ')
+                              console.log(response)
+
+                            })
+                            .catch(function (error) {
+                              console.log(error);
+                            });
+                            this.props.navigation.navigate("ListCart");
+                    }}
+
               >
               <Text style={{left:130, color:'white'}}>Add to Cart</Text>
             </Button>
