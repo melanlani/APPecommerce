@@ -22,7 +22,7 @@ class ListCart extends Component {
     super(props);
     this.state = {
       itemCart: [],
-      subtotal: 0
+      total: 0
     }
   }
 
@@ -50,27 +50,33 @@ class ListCart extends Component {
       const priceHolder = item.priceHolder;
       const qty = item.qty;
       const price = item.price;
-      const id = item.product_id;
+      const product_id = item.product_id;
       // console.error(priceHolder);
-
-
+      if (product_id !== undefined) {
+        const findId = this.state.itemCart.findIndex((val, i) => {
+          return val.product_id === product_id;
+        });
+        if (findId === -1) {
 
           const itemCart = this.state.itemCart;
           itemCart.push({
             orderId: orderId,
-            product_id: id,
+            product_id: product_id,
             imageHolder: imageHolder,
             nameProduct: nameProduct,
             priceHolder: priceHolder,
             qty: qty,
             price: price
           });
+          const total1 = this.state.itemCart.map(item => item.price)
+          const total2 = this.totalFormula(total1)
           this.setState({
+            total: total2,
             itemCart: itemCart
           })
-
-
-      });
+        }
+      }
+      })
     })
     .catch((error) => {
       console.log(error);
@@ -79,6 +85,8 @@ class ListCart extends Component {
 
   componentDidMount() {
   }
+
+  totalFormula = arr => arr.reduce((accumulator, currentValue) => parseInt(accumulator, 10) + parseInt(currentValue, 10))
 
   formatPrice = (num)=> {
     num = num.toString().replace(/\Rp|/g,'');
@@ -96,6 +104,19 @@ class ListCart extends Component {
       return `${num},${cents}`
   }
 
+  deleteCartItem = (product_id, nameProduct) => {
+    const baseUrl = "http://192.168.43.192:3333";
+      axios.delete(`${baseUrl}/api/v1/order/${product_id}`)
+      .then(function (res) {
+        alert(`Data ${nameProduct} deleted success `)
+        this.setState({
+          itemCart: this.state.itemCart
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+}
   render() {
     const {navigate} = this.props.navigation;
         if (this.state.itemCart.length == 0) {
@@ -127,33 +148,25 @@ class ListCart extends Component {
               data={this.state.itemCart}
               extraData = {this.state}
               renderItem={({ item }) => (
+
                 <Card>
+
                   <CardItem>
                     <Left>
                       <Thumbnail square source={{uri:  item.imageHolder}} />
                       <Body>
-                        <Text style={styles.textProduct}>{ item.nameProduct }{item.product_id}</Text>
+                        <Text style={styles.textProduct}>{ item.nameProduct }</Text>
                         <Text note>{this.formatPrice(item.priceHolder)}/pcs</Text>
                       </Body>
                     </Left>
                     <Right>
                       <Button transparent small
-                      onPress={() => {
-                                  const baseUrl = "http://192.168.43.192:3333";
-                                  axios.delete(`${baseUrl}/api/v1/order/${item.product_id}`)
-                                      .then(function (response) {
-                                        alert('tap')
-                                        console.log(response);
-
-                                      })
-                                      .catch(function (error) {
-                                        console.log(error);
-                                      });
-                              }} style={{ width: 40, justifyContent: 'center', alignItems: 'center' }}>
+                        onPress={ () => this.deleteCartItem(item.product_id, item.nameProduct) } style={{ width: 40, justifyContent: 'center', alignItems: 'center' }}>
                         <Icon name="close" style={{color:'#E91E63'}}/>
                       </Button>
                     </Right>
                   </CardItem>
+
                   <CardItem>
                   <Left>
                   <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -168,30 +181,36 @@ class ListCart extends Component {
                     </Button>
                   </View>
                   </Left>
-                  <Body style={{ marginRight: -90 }}>
-                    <Text style={{fontWeight:'bold'}}>Sub Total:{this.state.subtotal}</Text>
+                  <Body style={{ marginRight: -50 }}>
+                    <Text style={{fontWeight:'bold'}}>Sub Total:Rp. {this.formatPrice(item.price)}</Text>
                   </Body>
                 </CardItem>
+
               </Card>
             )}
             keyExtractor={(item, index) => index.toString()}
             />
 
             <Card>
+
               <CardItem>
               <Left>
                   <Text style={styles.textTotal}>Total</Text>
               </Left>
               <Right>
-                <Text style={styles.textPrice}>Rp.  </Text>
+                <Text style={styles.textPrice}>Rp. {this.formatPrice(this.state.total)} </Text>
               </Right>
               </CardItem>
             <CardItem>
-            <Button style={{width:320, backgroundColor:'#E91E63'}} onPress={() => {this.props.navigation.navigate('Checkout');}}>
+            <Button style={{width:320, backgroundColor:'#E91E63'}} onPress={() => {this.props.navigation.navigate('Checkout', {
+                        totalPrice: this.state.total
+                      });}}>
               <Text style={{left:130, color:'white'}}>Checkout</Text>
             </Button>
             </CardItem>
+
             </Card>
+
         </Container>
       );
   }

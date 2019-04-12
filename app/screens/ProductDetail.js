@@ -66,7 +66,7 @@ class ProductDetail extends Component {
           <CardItem>
           </CardItem>
           <CardItem>
-          
+
           {
             this.state.productImage !== '' ? (
             <Image source={{uri: `${this.state.productImage }`}} style={{height: 320, flex: 1}}/>
@@ -126,7 +126,8 @@ class ProductDetail extends Component {
                         const baseUrl = "http://192.168.43.192:3333";
                         axios.post(`${baseUrl}/api/v1/order`, {
                                 product_id: this.state.productId,
-                                qty: this.state.quantity
+                                qty: this.state.quantity,
+                                price: this.state.productPrice
                             })
                             .then(function (response) {
                               console.log(response);
