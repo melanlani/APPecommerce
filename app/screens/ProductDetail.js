@@ -66,7 +66,15 @@ class ProductDetail extends Component {
           <CardItem>
           </CardItem>
           <CardItem>
-            <Image source={{uri: `${this.state.productImage}`}} style={{height: 320, flex: 1}}/>
+          
+          {
+            this.state.productImage !== '' ? (
+            <Image source={{uri: `${this.state.productImage }`}} style={{height: 320, flex: 1}}/>
+          ) : (
+            <Text>tunggu..</Text>
+          )
+          }
+
           </CardItem>
           <CardItem>
           <Left>
@@ -118,18 +126,18 @@ class ProductDetail extends Component {
                         const baseUrl = "http://192.168.43.192:3333";
                         axios.post(`${baseUrl}/api/v1/order`, {
                                 product_id: this.state.productId,
-                                qty: this.state.quantity,
-                                price: this.state.productPrice
+                                qty: this.state.quantity
                             })
                             .then(function (response) {
-                              alert('Product added successfully ')
-                              console.log(response)
+                              console.log(response);
 
                             })
                             .catch(function (error) {
                               console.log(error);
                             });
-                            this.props.navigation.navigate("ListCart");
+                            this.props.navigation.navigate("ListCart", {
+                              product_id: this.state.productId
+                            });
                     }}
 
               >
