@@ -29,7 +29,7 @@ class Product extends Component {
             <Card>
               <CardItem>
                 <Left>
-                  <Text>{this.props.productName}</Text>
+                  <Text style={{fontSize:12}}>{this.props.productName}</Text>
                 </Left>
               </CardItem>
               <CardItem cardBody>

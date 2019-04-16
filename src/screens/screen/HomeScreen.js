@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import {StyleSheet, Alert, Image, Text, View, TouchableOpacity, FlatList} from 'react-native';
-import { Container, Content, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
+import { Container, Input, Content, Header, Left, Body, Right, Button, Icon, Title, CardItem, Card, Col, Row, Grid, Footer, FooterTab } from 'native-base';
 import axios from 'axios';
 import Product from "./Product";
+import { connect } from 'react-redux';
+import { incNumber } from '@redux/actions/contacts';
 
 class HomeScreen extends Component {
   constructor(props){
@@ -23,6 +25,10 @@ class HomeScreen extends Component {
       console.log(error);
     });
 
+  }
+  increment = () => {
+    this.props.dispatch(incNumber());
+      return console.error(this.props.count);
   }
 
   render() {
@@ -46,6 +52,18 @@ class HomeScreen extends Component {
         </Header>
         <Content>
           <Image source={require('../assets/banner.jpg')} style={{height: 170 ,width: '100%', resizeMode: 'contain'}}/>
+          <Card>
+            <CardItem>
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+              <View style={{ marginLeft: 8, marginTop: -11 }}>
+                <Input placeholder={this.props.count} style={{ justifyContent: 'center', alignItems: 'center' }} disabled />
+              </View>
+              <Button success small onPress={ this.increment } style={{ width: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#E91E63' }}>
+                <Text>+</Text>
+              </Button>
+            </View>
+            </CardItem>
+          </Card>
           <Card>
             <CardItem>
             <Text style={{fontWeight: 'bold'}}>List Product</Text>
@@ -88,4 +106,11 @@ const styles = StyleSheet.create({
   backgroundColor: '#E91E63',
   },
   });
-export default HomeScreen;
+
+  const mapStateToProps = (state) =>{
+    return {
+      count: state.count
+    };
+  }
+
+export default connect(mapStateToProps)(HomeScreen);
