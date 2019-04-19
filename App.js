@@ -10,23 +10,31 @@ import ProductDetail from './src/screens/ProductDetail'
 import ListCart from './src/screens/ListCart'
 import Checkout from './src/screens/Checkout'
 import Finished from './src/screens/Finished'
+import Login from './src/screens/Login'
 import ButtomNav from './src/screens/routes/buttomNav'
 
 const MainNavigator = createStackNavigator(
   {
-  HomeScreen: { screen: ButtomNav,
+  HomeScreen: {
+    screen: ButtomNav,
     headerMode: 'none',
     navigationOptions: {
       header: null,
-  } },
-  Home: { screen: HomeScreen,
-      headerMode: 'none',
-      navigationOptions: {
-        header: null,
-    } },
-  Detail : {screen: ProductDetail,
-      headerMode: '',
-      navigationOptions: {
+    }
+  },
+
+  Home: {
+    screen: HomeScreen,
+    headerMode: 'none',
+    navigationOptions: {
+      header: null,
+    }
+  },
+
+  Detail : {
+    screen: ProductDetail,
+    headerMode: '',
+    navigationOptions: {
       title: 'Detail Page',
       headerStyle: {
         backgroundColor: '#E91E63',
@@ -37,9 +45,11 @@ const MainNavigator = createStackNavigator(
       }
     }
   },
-  Checkout : {screen: Checkout,
-      headerMode: '',
-      navigationOptions: {
+
+  Checkout : {
+    screen: Checkout,
+    headerMode: '',
+    navigationOptions: {
       title: 'Checkout Page',
       headerStyle: {
         backgroundColor: '#E91E63',
@@ -50,9 +60,11 @@ const MainNavigator = createStackNavigator(
       }
     }
   },
-  Finished : {screen: Finished,
-      headerMode: '',
-      navigationOptions: {
+
+  Finished : {
+    screen: Finished,
+    headerMode: '',
+    navigationOptions: {
       title: 'Finishing',
       headerStyle: {
         backgroundColor: '#E91E63',
@@ -63,16 +75,33 @@ const MainNavigator = createStackNavigator(
       }
     }
   },
+
   ListCart: {
     screen: ListCart,
+    headerMode: 'none',
     navigationOptions: {
       tabBarLabel: "Cart",
       tabBarIcon:
         <Icon name="cart" />
+    }
+  },
 
+  Login : {
+    screen: Login,
+    headerMode: '',
+    navigationOptions: {
+      title: 'Login Page',
+      headerStyle: {
+        backgroundColor: '#E91E63',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
     }
   }
 },
+
   {
    initialRouteName: 'HomeScreen'
   }
@@ -97,7 +126,6 @@ export default class App extends Component<Props> {
   }
 
 }
-
 
 const styles = StyleSheet.create ({
   container: {

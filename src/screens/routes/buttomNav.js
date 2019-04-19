@@ -6,10 +6,7 @@ import HomeScreen from '../HomeScreen'
 import ListCart from '../ListCart'
 
 export const ButtomNav = createBottomTabNavigator({
-  //   Home: { screen: HomeScreen },
-  //   Settings: { screen: SettingsScreen },
-  //   Profile: { screen: ProfileScreen },
-
+  
   Home: {
     screen: HomeScreen,
     navigationOptions: {
@@ -27,7 +24,4 @@ export const ButtomNav = createBottomTabNavigator({
   }
 });
 
-
-
-//export const SignedOut = createAppContainer(SignedOutNavigator);
 export default createAppContainer(ButtomNav);
