@@ -14,36 +14,44 @@ export const addItemCart = ( productId, productPrice ) => {
 
 export const getCart = () => {
     return{
-        type: 'GET_CART',
-        payload: axios.get(`${baseUrl}/api/v1/orders`)
+      type: 'GET_CART',
+      payload: axios.get(`${baseUrl}/api/v1/orders`)
     }
 }
 
 export const deleteItem = (product_id) => {
     return{
-        type: 'DELETE_ITEM',
-        payload: axios.delete(`${baseUrl}/api/v1/order/${product_id}`)
+      type: 'DELETE_ITEM',
+      payload: axios.delete(`${baseUrl}/api/v1/order/${product_id}`)
     }
 }
 
 export const handlePlus = (product_id, qty, price) => {
 
     return {
-        type: 'PLUS_QTY',
-        payload: axios.patch(`${baseUrl}/api/v1/order/${product_id}`, {
-            qty: qty,
-            price: price
-        })
+      type: 'PLUS_QTY',
+      payload: axios.patch(`${baseUrl}/api/v1/order/${product_id}`, {
+          qty: qty,
+          price: price
+      })
     }
 }
 
 export const handleMin = (product_id, qty, price) => {
 
     return {
-        type: 'MIN_QTY',
-        payload: axios.patch(`${baseUrl}/api/v1/order/${product_id}`, {
-            qty: qty,
-            price: price
-        })
+      type: 'MIN_QTY',
+      payload: axios.patch(`${baseUrl}/api/v1/order/${product_id}`, {
+          qty: qty,
+          price: price
+      })
     }
 }
+
+export const addCart = (data) => {
+
+    return {
+      type: 'ADD_TO_CART',
+      payload: data
+      }
+    }

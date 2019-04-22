@@ -11,6 +11,7 @@ import ListCart from './src/screens/ListCart'
 import Checkout from './src/screens/Checkout'
 import Finished from './src/screens/Finished'
 import Login from './src/screens/Login'
+import Register from './src/screens/Register'
 import ButtomNav from './src/screens/routes/buttomNav'
 
 const MainNavigator = createStackNavigator(
@@ -91,6 +92,21 @@ const MainNavigator = createStackNavigator(
     headerMode: '',
     navigationOptions: {
       title: 'Login Page',
+      headerStyle: {
+        backgroundColor: '#E91E63',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
+    }
+  },
+
+  Register : {
+    screen: Register,
+    headerMode: '',
+    navigationOptions: {
+      title: 'Register Page',
       headerStyle: {
         backgroundColor: '#E91E63',
       },

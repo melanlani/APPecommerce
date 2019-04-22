@@ -5,6 +5,7 @@ import { Container,Header,Left,Body,Right,Button,Icon,Title,CardItem,Card,Thumbn
 import { baseUrl } from '../redux/actions/api';
 import Axios from 'axios';
 import EmptyCart from "./EmptyCart";
+import { connect } from 'react-redux';
 import { getCart, deleteItem, handlePlus, handleMin } from '../redux/actions/orders';
 
 class ListCart extends Component {
@@ -17,38 +18,32 @@ class ListCart extends Component {
     }
   }
 
-  componentWillMount(){
+  componentDidMount(){
     this.props.navigation.addListener("willFocus", route => {
         this.addData();
     })
   }
 
   addData() {
-
-    const { navigation } = this.props;
-    const id = navigation.getParam("product_id", "");
-
-    Axios.get(`${baseUrl}/api/v1/orders/${id}`)
+    Axios.get(`${baseUrl}/api/v1/orders/`)
     .then((res) => {
-      // console.error(res.data.data);
       const products= res.data.data;
       products.forEach((item) => {
-      const orderId = item.id;
+      const orderId = item.orderId;
       const imageHolder = item.imageHolder;
       const nameProduct = item.nameProduct;
       const priceHolder = item.priceHolder;
       const qty = item.qty;
       const price = item.price;
       const product_id = item.product_id;
-      // console.error(priceHolder);
       if (product_id !== undefined) {
         const findId = this.state.itemCart.findIndex((val, i) => {
           return val.product_id === product_id;
         });
         if (findId === -1) {
 
-          const itemCart = this.state.itemCart;
-          itemCart.push({
+          const itemNewCart = this.state.itemCart;
+          itemNewCart.push({
             orderId: orderId,
             product_id: product_id,
             imageHolder: imageHolder,
@@ -60,17 +55,20 @@ class ListCart extends Component {
           const total1 = this.state.itemCart.map(item => item.price)
           const total2 = this.totalFormula(total1)
           this.setState({
+            itemCart :[...itemNewCart],
             total: total2,
-            itemCart: itemCart,
-            pending: false
+            pending: false,
+            refresh: !this.state.itemCart
           })
         }
       }
       })
+
     })
     .catch((error) => {
       console.log(error);
     })
+
   }
 
   totalFormula = arr => arr.reduce((accumulator, currentValue) => parseInt(accumulator, 10) + parseInt(currentValue, 10))
@@ -97,52 +95,100 @@ class ListCart extends Component {
               const total1 = this.state.itemCart.map(item => item.price)
               const total2 = this.totalFormula(total1)
               this.setState({
-                itemCart: this.state.itemCart,
-                total: total2
+                itemCart: [...this.state.itemCart],
+                total: total2,
+                pending: false
               })
             })
             .catch(error => {
               console.log(error);
             })
+            this.setState({
+              itemCart: [...this.state.itemCart],
+              pending: false
+            })
           }
         },
       ],
-      { cancelable: false},
+      { cancelable: false },
     );
   }
 
-  handlePlus = (orderId,index) => {
+  handlePlus = (orderId,qty, price, index) => {
     this.state.itemCart[index].qty = this.state.itemCart[index].qty+1
     this.state.itemCart[index].price = parseInt(this.state.itemCart[index].qty, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
-    this.forceUpdate()
 
+    const quantity = qty+1;
+    const subtotal = price;
+    Axios.patch(`${baseUrl}/api/v1/order/${orderId}`,{
+      qty: quantity,
+      price: subtotal
+    })
+    .then(res => {
+      const total1 = this.state.itemCart.map(item => item.price)
+      const total2 = this.totalFormula(total1)
+      this.setState({
+        itemCart: [...this.state.itemCart],
+        total: total2
+      })
+    })
+    .catch(error => {
+      console.log(error);
+    })
     const total1 = this.state.itemCart.map(item => item.price)
     const total2 = this.totalFormula(total1)
     this.setState({
+      itemCart: [...this.state.itemCart],
       total: total2
     })
+
   }
 
-  handleMin = (orderId,index) => {
+  handleMin = (orderId,qty, price, index) => {
     if(this.state.itemCart[index].qty > 1) {
     this.state.itemCart[index].qty = this.state.itemCart[index].qty-1
     this.state.itemCart[index].price = parseInt(this.state.itemCart[index].qty, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
-    this.forceUpdate()
-
+    const quantity = qty-1;
+    const subtotal = price;
+    Axios.patch(`${baseUrl}/api/v1/order/${orderId}`,{
+      qty: quantity,
+      price: subtotal
+    })
+    .then(res => {
+      const total1 = this.state.itemCart.map(item => item.price)
+      const total2 = this.totalFormula(total1)
+      this.setState({
+        itemCart: [...this.state.itemCart],
+        total: total2
+      })
+    })
+    .catch(error => {
+      console.log(error);
+    })
     const total1 = this.state.itemCart.map(item => item.price)
     const total2 = this.totalFormula(total1)
     this.setState({
+      itemCart: [...this.state.itemCart],
       total: total2
     })
-    }
   }
+}
 
   render() {
-      if (this.state.itemCart.length == 0) {
-        return (
-            <EmptyCart />
-        )
-      }
+
+    if (this.state.itemCart.length == 0) {
+      return (
+          <EmptyCart />
+      )
+    }
+    if (this.state.pending) {
+      return(
+        <View style={styles.viewPending}>
+          <ActivityIndicator color="#E91E63" size="large"  />
+        </View>
+      )
+    }
+    else {
       return(
         <Container>
           <Header style={styles.header}>
@@ -164,7 +210,7 @@ class ListCart extends Component {
           <FlatList
             style={{ flex: 1 }}
             data={this.state.itemCart}
-            extraData = {this.state}
+            extraData = {this.state.refresh}
             renderItem={({ item, index }) => (
 
             <Card>
@@ -187,13 +233,13 @@ class ListCart extends Component {
               <CardItem>
                 <Left>
                 <View style={{ flex: 1, flexDirection: 'row' }}>
-                  <Button success small onPress={ () => this.handleMin(item.orderId, index) } style={styles.btnQty}>
+                  <Button success small onPress={ () => this.handleMin(item.orderId, item.qty, item.price, index) } style={styles.btnQty}>
                     <Text>-</Text>
                   </Button>
-                  <View style={{ marginLeft: 8, marginTop: -11 }}>
+                  <View style={styles.viewQty}>
                     <Input placeholder={`${item.qty}`} style={styles.inputQty} disabled />
                   </View>
-                  <Button success small onPress={ () => this.handlePlus(item.orderId, index) } style={styles.btnQty}>
+                  <Button success small onPress={ () => this.handlePlus(item.orderId, item.qty, item.price, index) } style={styles.btnQty}>
                     <Text>+</Text>
                   </Button>
                 </View>
@@ -228,6 +274,7 @@ class ListCart extends Component {
 
         </Container>
       );
+    }
   }
 }
 
@@ -261,6 +308,10 @@ class ListCart extends Component {
       justifyContent: 'center',
       alignItems: 'center'
     },
+    viewQty: {
+      marginLeft: 8,
+      marginTop: -11
+    },
     btnQty: {
       width: 20,
       justifyContent: 'center',
@@ -288,4 +339,25 @@ class ListCart extends Component {
     },
   });
 
-export default ListCart;
+  const mapStateToProps = state => ({
+    orders : state.orders
+  })
+
+  const mapDispatchToProps = dispatch => {
+    return {
+      getCartDispatch: () => {
+        dispatch(getCart())
+      },
+      deleteItemDispatch: (id) => {
+        dispatch(deleteItem(id))
+      },
+      plusQtyDispatch: (product_id, qty, price) => {
+        dispatch(handlePlus(product_id, qty, price))
+      },
+      minQtyDispatch: (product_id, qty, price) => {
+        dispatch(handleMin(product_id, qty, price))
+      },
+    }
+  }
+
+export default connect(mapStateToProps, mapDispatchToProps)(ListCart);
