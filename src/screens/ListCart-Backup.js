@@ -18,12 +18,14 @@ class ListCart extends Component {
         this.props.getCartDispatch();
     }
 
-  handlePlus = (product_id, qty, price) => {
-    this.props.plusQtyDispatch(product_id, qty + 1, price);
+  handlePlus = (product_id, qty, priceHolder) => {
+    this.props.plusQtyDispatch(product_id, qty + 1, priceHolder);
+    this.props.getCartDispatch();
   };
 
-  handleMin = (product_id, qty, price) => {
-    this.props.minQtyDispatch(product_id, qty - 1, price);
+  handleMin = (product_id, qty, priceHolder) => {
+    this.props.minQtyDispatch(product_id, qty - 1, priceHolder);
+    this.props.getCartDispatch();
   };
 
   totalFormula = arr => arr.reduce((accumulator, currentValue) => parseInt(accumulator, 10) + parseInt(currentValue, 10))
@@ -81,13 +83,13 @@ class ListCart extends Component {
               <CardItem>
                 <Left>
                 <View style={{ flex: 1, flexDirection: 'row' }}>
-                  <Button success small onPress={() => this.handleMin(item.product_id, item.qty, item.price)} style={styles.btnQty}>
+                  <Button success small onPress={() => this.handleMin(item.product_id, item.qty, item.priceHolder)} style={styles.btnQty}>
                     <Text>-</Text>
                   </Button>
                   <View style={{ marginLeft: 8, marginTop: -11 }}>
                     <Input placeholder={`${item.qty}`} style={styles.inputQty} disabled />
                   </View>
-                  <Button success small onPress={() => this.handlePlus(item.product_id, item.qty+ 1, item.price)} style={styles.btnQty}>
+                  <Button success small onPress={() => this.handlePlus(item.product_id, item.qty+ 1, item.priceHolder)} style={styles.btnQty}>
                     <Text>+</Text>
                   </Button>
                 </View>
@@ -210,11 +212,11 @@ class ListCart extends Component {
       deleteItemDispatch: (id) => {
         dispatch(deleteItem(id))
       },
-      plusQtyDispatch: (product_id, qty, price) => {
-        dispatch(handlePlus(product_id, qty, price))
+      plusQtyDispatch: (product_id, qty, priceHolder) => {
+        dispatch(handlePlus(product_id, qty, priceHolder))
       },
-      minQtyDispatch: (product_id, qty, price) => {
-        dispatch(handleMin(product_id, qty, price))
+      minQtyDispatch: (product_id, qty, priceHolder) => {
+        dispatch(handleMin(product_id, qty, priceHolder))
       },
     }
   }

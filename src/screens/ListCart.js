@@ -9,74 +9,16 @@ import { connect } from 'react-redux';
 import { getCart, deleteItem, handlePlus, handleMin } from '../redux/actions/orders';
 
 class ListCart extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      itemCart: [],
-      total: 0,
-      pending: true
-    }
-  }
 
   componentDidMount(){
-    this.props.navigation.addListener("willFocus", route => {
-        this.addData();
+    this.props.navigation.addListener("didFocus", route => {
+      this.props.getCartDispatch();
     })
   }
 
-  addData() {
-    Axios.get(`${baseUrl}/api/v1/orders/`)
-    .then((res) => {
-      const products= res.data.data;
-      products.forEach((item) => {
-      const orderId = item.orderId;
-      const imageHolder = item.imageHolder;
-      const nameProduct = item.nameProduct;
-      const priceHolder = item.priceHolder;
-      const qty = item.qty;
-      const price = item.price;
-      const product_id = item.product_id;
-      if (product_id !== undefined) {
-        const findId = this.state.itemCart.findIndex((val, i) => {
-          return val.product_id === product_id;
-        });
-        if (findId === -1) {
-
-          const itemNewCart = this.state.itemCart;
-          itemNewCart.push({
-            orderId: orderId,
-            product_id: product_id,
-            imageHolder: imageHolder,
-            nameProduct: nameProduct,
-            priceHolder: priceHolder,
-            qty: qty,
-            price: price
-          });
-          const total1 = this.state.itemCart.map(item => item.price)
-          const total2 = this.totalFormula(total1)
-          this.setState({
-            itemCart :[...itemNewCart],
-            total: total2,
-            pending: false,
-            refresh: !this.state.itemCart
-          })
-        }
-      }
-      })
-
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-
-  }
-
-  totalFormula = arr => arr.reduce((accumulator, currentValue) => parseInt(accumulator, 10) + parseInt(currentValue, 10))
-
-  deleteCartItem = (product_id) => {
+  deleteItem(orderId) {
     Alert.alert(
-      'Are you sure?',
-      'You wont be able to revert this',
+      'Are you sure to delete item?','',
       [
         {
           text: 'Cancel',
@@ -85,28 +27,8 @@ class ListCart extends Component {
         },
         { text: 'OK', onPress: () =>
           {
-            for (var i = 0; i < this.state.itemCart.length; i++) {
-            	if (this.state.itemCart[i].product_id == product_id ) {
-            		this.state.itemCart.splice(i, 1);
-            	}
-            }
-            Axios.delete(`${baseUrl}/api/v1/order/${product_id}`)
-            .then(res => {
-              const total1 = this.state.itemCart.map(item => item.price)
-              const total2 = this.totalFormula(total1)
-              this.setState({
-                itemCart: [...this.state.itemCart],
-                total: total2,
-                pending: false
-              })
-            })
-            .catch(error => {
-              console.log(error);
-            })
-            this.setState({
-              itemCart: [...this.state.itemCart],
-              pending: false
-            })
+            this.props.deleteItemDispatch(orderId);
+            this.props.getCartDispatch();
           }
         },
       ],
@@ -114,74 +36,19 @@ class ListCart extends Component {
     );
   }
 
-  handlePlus = (orderId,qty, price, index) => {
-    this.state.itemCart[index].qty = this.state.itemCart[index].qty+1
-    this.state.itemCart[index].price = parseInt(this.state.itemCart[index].qty, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
+  handlePlus = (orderId, qty, price,index) => {
+    this.props.plusQtyDispatch(orderId, qty + 1, price);
+    this.props.getCartDispatch();
+  };
 
-    const quantity = qty+1;
-    const subtotal = price;
-    Axios.patch(`${baseUrl}/api/v1/order/${orderId}`,{
-      qty: quantity,
-      price: subtotal
-    })
-    .then(res => {
-      const total1 = this.state.itemCart.map(item => item.price)
-      const total2 = this.totalFormula(total1)
-      this.setState({
-        itemCart: [...this.state.itemCart],
-        total: total2
-      })
-    })
-    .catch(error => {
-      console.log(error);
-    })
-    const total1 = this.state.itemCart.map(item => item.price)
-    const total2 = this.totalFormula(total1)
-    this.setState({
-      itemCart: [...this.state.itemCart],
-      total: total2
-    })
-
-  }
-
-  handleMin = (orderId,qty, price, index) => {
-    if(this.state.itemCart[index].qty > 1) {
-    this.state.itemCart[index].qty = this.state.itemCart[index].qty-1
-    this.state.itemCart[index].price = parseInt(this.state.itemCart[index].qty, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
-    const quantity = qty-1;
-    const subtotal = price;
-    Axios.patch(`${baseUrl}/api/v1/order/${orderId}`,{
-      qty: quantity,
-      price: subtotal
-    })
-    .then(res => {
-      const total1 = this.state.itemCart.map(item => item.price)
-      const total2 = this.totalFormula(total1)
-      this.setState({
-        itemCart: [...this.state.itemCart],
-        total: total2
-      })
-    })
-    .catch(error => {
-      console.log(error);
-    })
-    const total1 = this.state.itemCart.map(item => item.price)
-    const total2 = this.totalFormula(total1)
-    this.setState({
-      itemCart: [...this.state.itemCart],
-      total: total2
-    })
-  }
-}
+  handleMin = (orderId, qty, price,index) => {
+    this.props.minQtyDispatch(orderId, qty - 1, price);
+    this.props.getCartDispatch();
+  };
 
   render() {
 
-    if (this.state.itemCart.length == 0) {
-      return (
-          <EmptyCart />
-      )
-    }
-    if (this.state.pending) {
+    if (this.props.orders.pending) {
       return(
         <View style={styles.viewPending}>
           <ActivityIndicator color="#E91E63" size="large"  />
@@ -189,6 +56,11 @@ class ListCart extends Component {
       )
     }
     else {
+    if (this.props.orders.itemCart.length == 0) {
+      return (
+          <EmptyCart />
+      )
+    }
       return(
         <Container>
           <Header style={styles.header}>
@@ -209,8 +81,9 @@ class ListCart extends Component {
 
           <FlatList
             style={{ flex: 1 }}
-            data={this.state.itemCart}
-            extraData = {this.state.refresh}
+            keyExtractor={item => item.orderId.toString()}
+            data={this.props.orders.itemCart}
+            extraData = {this.props}
             renderItem={({ item, index }) => (
 
             <Card>
@@ -224,7 +97,7 @@ class ListCart extends Component {
                 </Left>
                 <Right>
                   <Button transparent small
-                    onPress={ () => this.deleteCartItem(item.product_id) } style={styles.btnDelete}>
+                    onPress={() => this.deleteItem(item.orderId)} style={styles.btnDelete}>
                     <Icon name="close" style={{color:'#E91E63'}}/>
                   </Button>
                 </Right>
@@ -245,12 +118,11 @@ class ListCart extends Component {
                 </View>
                 </Left>
                 <Right>
-                  <Text style={{fontWeight:'bold'}}>Rp. {item.price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}</Text>
+                  <Text style={{fontWeight:'bold'}}>Rp. {item.subtotal.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}</Text>
                 </Right>
               </CardItem>
             </Card>
           )}
-          keyExtractor={(item, index) => index.toString()}
           />
 
           <Card>
@@ -259,13 +131,13 @@ class ListCart extends Component {
                   <Text style={styles.textTotal}>Total</Text>
               </Left>
               <Right>
-                <Text style={styles.textPrice}>Rp. {this.state.total.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")} </Text>
+                <Text style={styles.textPrice}>Rp. {this.props.orders.total}</Text>
               </Right>
             </CardItem>
             <CardItem>
               <Button style={styles.btnCheckout} onPress={() => { this.props.navigation.navigate('Checkout', {
-                totalPrice: this.state.total,
-                itemCart: this.state.itemCart
+                totalPrice: this.props.orders.total,
+                itemCart: this.props.orders.itemCart
               });}}>
                 <Text style={styles.txtCheckout}>Checkout</Text>
               </Button>
@@ -348,14 +220,14 @@ class ListCart extends Component {
       getCartDispatch: () => {
         dispatch(getCart())
       },
-      deleteItemDispatch: (id) => {
-        dispatch(deleteItem(id))
+      deleteItemDispatch: (orderId) => {
+        dispatch(deleteItem(orderId))
       },
-      plusQtyDispatch: (product_id, qty, price) => {
-        dispatch(handlePlus(product_id, qty, price))
+      plusQtyDispatch: (orderId, qty, price) => {
+        dispatch(handlePlus(orderId, qty, price))
       },
-      minQtyDispatch: (product_id, qty, price) => {
-        dispatch(handleMin(product_id, qty, price))
+      minQtyDispatch: (orderId, qty, price) => {
+        dispatch(handleMin(orderId, qty, price))
       },
     }
   }
