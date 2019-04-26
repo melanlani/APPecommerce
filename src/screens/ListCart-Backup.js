@@ -1,38 +1,187 @@
 import React, { Component } from 'react';
 import { Alert, StyleSheet, Image, Text, View, FlatList, ActivityIndicator } from 'react-native';
 import { Container,Header,Left,Body,Right,Button,Icon,Title,CardItem,Card,Thumbnail,Input } from 'native-base';
-import EmptyCart from "./EmptyCart";
+
 import { baseUrl } from '../redux/actions/api';
 import Axios from 'axios';
+import EmptyCart from "./EmptyCart";
 import { connect } from 'react-redux';
 import { getCart, deleteItem, handlePlus, handleMin } from '../redux/actions/orders';
 
 class ListCart extends Component {
-
-  componentDidMount() {
-    this.props.getCartDispatch();
+  constructor(props) {
+    super(props);
+    this.state = {
+      itemCart: [],
+      total: 0,
+      pending: true
     }
+  }
 
-  deleteItem(id) {
-        this.props.deleteItemDispatch(id);
-        this.props.getCartDispatch();
-    }
+  componentDidMount(){
+    this.props.navigation.addListener("didFocus", route => {
+        this.addData();
+    })
+  }
 
-  handlePlus = (product_id, qty, priceHolder) => {
-    this.props.plusQtyDispatch(product_id, qty + 1, priceHolder);
-    this.props.getCartDispatch();
-  };
+  addData() {
+    Axios.get(`${baseUrl}/api/v1/orders/`)
+    .then((res) => {
+      const products= res.data.data;
+      products.forEach((item) => {
+      const orderId = item.orderId;
+      const imageHolder = item.imageHolder;
+      const nameProduct = item.nameProduct;
+      const priceHolder = item.priceHolder;
+      const qty = item.qty;
+      const price = item.price;
+      const product_id = item.product_id;
+      if (product_id !== undefined) {
+        const findId = this.state.itemCart.findIndex((val, i) => {
+          return val.product_id === product_id;
+        });
+        if (findId === -1) {
 
-  handleMin = (product_id, qty, priceHolder) => {
-    this.props.minQtyDispatch(product_id, qty - 1, priceHolder);
-    this.props.getCartDispatch();
-  };
+          const itemNewCart = this.state.itemCart;
+          itemNewCart.push({
+            orderId: orderId,
+            product_id: product_id,
+            imageHolder: imageHolder,
+            nameProduct: nameProduct,
+            priceHolder: priceHolder,
+            qty: qty,
+            price: price
+          });
+          const total1 = this.state.itemCart.map(item => item.price)
+          const total2 = this.totalFormula(total1)
+          this.setState({
+            itemCart :[...itemNewCart],
+            total: total2,
+            pending: false,
+            refresh: !this.state.itemCart
+          })
+        }
+      }
+      })
+
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+
+  }
 
   totalFormula = arr => arr.reduce((accumulator, currentValue) => parseInt(accumulator, 10) + parseInt(currentValue, 10))
 
+  deleteCartItem = (product_id) => {
+    Alert.alert(
+      'Are you sure?',
+      'You wont be able to revert this',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () =>
+          {
+            for (var i = 0; i < this.state.itemCart.length; i++) {
+            	if (this.state.itemCart[i].product_id == product_id ) {
+            		this.state.itemCart.splice(i, 1);
+            	}
+            }
+            Axios.delete(`${baseUrl}/api/v1/order/${product_id}`)
+            .then(res => {
+              const total1 = this.state.itemCart.map(item => item.price)
+              const total2 = this.totalFormula(total1)
+              this.setState({
+                itemCart: [...this.state.itemCart],
+                total: total2,
+                pending: false
+              })
+            })
+            .catch(error => {
+              console.log(error);
+            })
+            this.setState({
+              itemCart: [...this.state.itemCart],
+              pending: false
+            })
+          }
+        },
+      ],
+      { cancelable: false },
+    );
+  }
+
+  handlePlus = (orderId,qty, price, index) => {
+    this.state.itemCart[index].qty = this.state.itemCart[index].qty+1
+    this.state.itemCart[index].price = parseInt(this.state.itemCart[index].qty, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
+
+    const quantity = qty+1;
+    const subtotal = price;
+    Axios.patch(`${baseUrl}/api/v1/order/${orderId}`,{
+      qty: quantity,
+      price: subtotal
+    })
+    .then(res => {
+      const total1 = this.state.itemCart.map(item => item.price)
+      const total2 = this.totalFormula(total1)
+      this.setState({
+        itemCart: [...this.state.itemCart],
+        total: total2
+      })
+    })
+    .catch(error => {
+      console.log(error);
+    })
+    const total1 = this.state.itemCart.map(item => item.price)
+    const total2 = this.totalFormula(total1)
+    this.setState({
+      itemCart: [...this.state.itemCart],
+      total: total2
+    })
+
+  }
+
+  handleMin = (orderId,qty, price, index) => {
+    if(this.state.itemCart[index].qty > 1) {
+    this.state.itemCart[index].qty = this.state.itemCart[index].qty-1
+    this.state.itemCart[index].price = parseInt(this.state.itemCart[index].qty, 10)*parseInt(this.state.itemCart[index].priceHolder, 10)
+    const quantity = qty-1;
+    const subtotal = price;
+    Axios.patch(`${baseUrl}/api/v1/order/${orderId}`,{
+      qty: quantity,
+      price: subtotal
+    })
+    .then(res => {
+      const total1 = this.state.itemCart.map(item => item.price)
+      const total2 = this.totalFormula(total1)
+      this.setState({
+        itemCart: [...this.state.itemCart],
+        total: total2
+      })
+    })
+    .catch(error => {
+      console.log(error);
+    })
+    const total1 = this.state.itemCart.map(item => item.price)
+    const total2 = this.totalFormula(total1)
+    this.setState({
+      itemCart: [...this.state.itemCart],
+      total: total2
+    })
+  }
+}
+
   render() {
-    const { pending, itemCart } = this.props.orders;
-    if (pending) {
+
+    if (this.state.itemCart.length == 0) {
+      return (
+          <EmptyCart />
+      )
+    }
+    if (this.state.pending) {
       return(
         <View style={styles.viewPending}>
           <ActivityIndicator color="#E91E63" size="large"  />
@@ -60,21 +209,22 @@ class ListCart extends Component {
 
           <FlatList
             style={{ flex: 1 }}
-            data={this.props.orders.itemCart}
-            renderItem={({ item }) => (
+            data={this.state.itemCart}
+            extraData = {this.state.refresh}
+            renderItem={({ item, index }) => (
 
             <Card>
               <CardItem>
                 <Left>
                   <Thumbnail square source={{uri:  item.imageHolder}} />
                   <Body>
-                    <Text style={styles.textProduct}>{ item.nameProduct } { item.orderId } { item.product_id }</Text>
+                    <Text style={styles.textProduct}>{ item.nameProduct }</Text>
                     <Text note>{item.priceHolder.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}/pcs</Text>
                   </Body>
                 </Left>
                 <Right>
                   <Button transparent small
-                    onPress={() => this.deleteItem(item.id)} style={styles.btnDelete}>
+                    onPress={ () => this.deleteCartItem(item.product_id) } style={styles.btnDelete}>
                     <Icon name="close" style={{color:'#E91E63'}}/>
                   </Button>
                 </Right>
@@ -83,13 +233,13 @@ class ListCart extends Component {
               <CardItem>
                 <Left>
                 <View style={{ flex: 1, flexDirection: 'row' }}>
-                  <Button success small onPress={() => this.handleMin(item.product_id, item.qty, item.priceHolder)} style={styles.btnQty}>
+                  <Button success small onPress={ () => this.handleMin(item.orderId, item.qty, item.price, index) } style={styles.btnQty}>
                     <Text>-</Text>
                   </Button>
-                  <View style={{ marginLeft: 8, marginTop: -11 }}>
+                  <View style={styles.viewQty}>
                     <Input placeholder={`${item.qty}`} style={styles.inputQty} disabled />
                   </View>
-                  <Button success small onPress={() => this.handlePlus(item.product_id, item.qty+ 1, item.priceHolder)} style={styles.btnQty}>
+                  <Button success small onPress={ () => this.handlePlus(item.orderId, item.qty, item.price, index) } style={styles.btnQty}>
                     <Text>+</Text>
                   </Button>
                 </View>
@@ -103,14 +253,13 @@ class ListCart extends Component {
           keyExtractor={(item, index) => index.toString()}
           />
 
-
           <Card>
             <CardItem>
               <Left>
                   <Text style={styles.textTotal}>Total</Text>
               </Left>
               <Right>
-                <Text style={styles.textPrice}>Rp.  </Text>
+                <Text style={styles.textPrice}>Rp. {this.state.total.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")} </Text>
               </Right>
             </CardItem>
             <CardItem>
@@ -159,6 +308,10 @@ class ListCart extends Component {
       justifyContent: 'center',
       alignItems: 'center'
     },
+    viewQty: {
+      marginLeft: 8,
+      marginTop: -11
+    },
     btnQty: {
       width: 20,
       justifyContent: 'center',
@@ -184,20 +337,6 @@ class ListCart extends Component {
       justifyContent: 'center',
       color: '#E91E63'
     },
-    viewIcon: {
-      justifyContent: "center",
-      alignItems: "center",
-      flex:1
-    },
-    iconCart: {
-      color: "#E91E63",
-      fontSize: 200
-    },
-    txtCart: {
-      fontSize: 20,
-      fontWeight: "bold",
-      color: 'black'
-    }
   });
 
   const mapStateToProps = state => ({
@@ -212,11 +351,11 @@ class ListCart extends Component {
       deleteItemDispatch: (id) => {
         dispatch(deleteItem(id))
       },
-      plusQtyDispatch: (product_id, qty, priceHolder) => {
-        dispatch(handlePlus(product_id, qty, priceHolder))
+      plusQtyDispatch: (product_id, qty, price) => {
+        dispatch(handlePlus(product_id, qty, price))
       },
-      minQtyDispatch: (product_id, qty, priceHolder) => {
-        dispatch(handleMin(product_id, qty, priceHolder))
+      minQtyDispatch: (product_id, qty, price) => {
+        dispatch(handleMin(product_id, qty, price))
       },
     }
   }

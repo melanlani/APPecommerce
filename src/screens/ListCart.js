@@ -42,7 +42,9 @@ class ListCart extends Component {
   };
 
   handleMin = (orderId, qty, price,index) => {
+    if(this.props.orders.itemCart[index].qty > 1) {
     this.props.minQtyDispatch(orderId, qty - 1, price);
+  }
     this.props.getCartDispatch();
   };
 
